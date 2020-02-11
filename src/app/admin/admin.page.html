@@ -1,0 +1,32 @@
+
+
+<ion-content>
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="admin-clock-in">
+        <ion-label>Clock in</ion-label>
+        <ion-icon name="alarm"></ion-icon>
+      </ion-tab-button>
+      <ion-tab-button tab="admin-events">
+        <ion-label>Events</ion-label>
+        <ion-icon name="calendar"> </ion-icon>
+      </ion-tab-button>
+      <ion-tab-button  tab="admin-users">
+        <ion-label>Employees</ion-label>
+        <ion-icon name="people"> </ion-icon>
+      </ion-tab-button>
+      <ion-tab-button  (click)="logout()">
+        
+        <ion-label>Log out</ion-label>
+        <ion-icon name="log-out"> </ion-icon>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+
+</ion-content>
+
+<style>
+  ion-tab-button{
+    --color-selected: #fcba03;
+  }
+</style>

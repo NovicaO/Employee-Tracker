@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Last 7 days</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/tabs/admin-users"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <ion-list>
+    <ion-item *ngFor="let item of printObjects | keyvalue">
+      <ion-label>{{item.value.startTime }}</ion-label>
+          <ion-chip>
+            <ion-label>{{item.value.totalHours? item.value.totalHours: 'Not available'}}</ion-label>
+          </ion-chip>
+    </ion-item>
+    <ion-item *ngIf="printObjects.length === 0">
+        <ion-label>No data for this user</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

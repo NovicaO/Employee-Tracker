@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/tabs/admin-clock-in"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{user.userName}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+  <ion-card *ngIf="user.startLat">
+    <ion-img src='https://maps.googleapis.com/maps/api/staticmap?zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:{{user.userName}}%7C{{user.startLat}},{{user.startLng}}&key=AIzaSyCgWD6kj33gXXJOVWQQT4alNxJ1LNj5txM'
+    ></ion-img>  
+    <ion-card-header>
+     <ion-card-subtitle>Clock in information</ion-card-subtitle>
+     <ion-card-title>User clocked in at {{user.startTime}} </ion-card-title>
+       <!-- <ion-card-title>{{user.userName}}</ion-card-title> -->
+    </ion-card-header>
+    <ion-card-content>
+      <!-- {{user.userName}} clocked in at {{user.startTime}} on the {{user.startAddress}} address. -->
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="user.endLat">
+    <ion-img src='https://maps.googleapis.com/maps/api/staticmap?zoom=15&size=600x300&maptype=roadmap&markers=color:red%7Clabel:{{user.userName}}%7C{{user.endLat}},{{user.endLng}}&key=AIzaSyCgWD6kj33gXXJOVWQQT4alNxJ1LNj5txM'
+    ></ion-img>  
+    <ion-card-header>
+       <ion-card-subtitle>Clock out information</ion-card-subtitle>
+       <ion-card-title>User clocked out at {{user.endTime}} and worked for {{user.totalHours}}!</ion-card-title>
+      <!-- <ion-card-title>{{user.userName}}</ion-card-title> -->
+    </ion-card-header>
+    <ion-card-content>
+      <!-- {{user.userName}} clocked out at {{user.endTime}} on the {{user.endAddress}} address. -->
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="!user.endLat">
+
+    <ion-card-header>
+      <ion-card-subtitle>Clock out information</ion-card-subtitle>
+      <ion-card-title>{{user.userName}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      This user didn't clock out yet. Waiting for clock out info...
+    </ion-card-content>
+  </ion-card>
+  
+
+</ion-content>

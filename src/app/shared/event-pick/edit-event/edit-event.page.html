@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Edit</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-item>
+    <ion-label position="floating">Title</ion-label>
+    <ion-input [(ngModel)]="evnt.title"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating">Description</ion-label>
+    <ion-input [(ngModel)]="evnt.desc"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label>Start date</ion-label>
+    <ion-datetime displayFormat="MM/DD/YYYY HH:mm" [(ngModel)]="startTime"></ion-datetime>
+  </ion-item>
+  <ion-item>
+    <ion-label>End date</ion-label>
+    <ion-datetime displayFormat="MM/DD/YYYY HH:mm" [(ngModel)]="endTime"></ion-datetime>
+  </ion-item>
+  <ion-item>
+    <ion-label >All Day</ion-label>
+    <ion-toggle slot="end" color="success" [(ngModel)]='evnt.allDay'></ion-toggle>
+  </ion-item>
+  <ion-button color="danger" class="button button-block" (click)="dismissModal()">Change</ion-button>
+
+
+</ion-content>

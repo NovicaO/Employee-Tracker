@@ -1,0 +1,99 @@
+<div>
+  <!-- <ion-card *ngIf="data">
+    <ion-card-header>
+      <ion-card-title >You clocked in at <br/>{{ data.startAddress }}</ion-card-title>
+      <ion-card-subtitle >Clock in time: {{ data.startTime }}</ion-card-subtitle >
+    </ion-card-header>
+    <ion-card-content>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="data && data.endTime">
+    <ion-card-header>
+      <ion-card-title >You clocked out at <br/>{{ data.endAddress }}</ion-card-title>
+      <ion-card-subtitle >Clock out time: {{ data.endTime }}</ion-card-subtitle >
+    </ion-card-header>
+    <ion-card-content>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="!isClockedIn && disableButton">
+    <ion-card-header>
+      <ion-card-title >That's it for today. You will be able to clock in tomorrow again.</ion-card-title>
+      <ion-card-subtitle >Your work time: {{ data.totalHours }}</ion-card-subtitle >
+    </ion-card-header>
+    <ion-card-content>
+    </ion-card-content>
+  </ion-card> -->
+
+  
+  <ion-grid>
+    <ion-card  #clockInButton *ngIf="!this.user.isAdmin" class="bounceIn">
+      <img src="../../../../assets/images/westpark.jpg" />
+      <ion-card-header>
+        <ion-card-subtitle>Clock in</ion-card-subtitle>
+        <ion-card-title>Clocking in will calculate your work hours automatically. When you finish, clock out to complete work day. </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button  [color]="isClockedIn ? 'danger' : 'warning'" (click)="isClockedIn? newClockOut(): newClockIn()"  expand="block" shape="round" [disabled]="disableButton">
+          {{isClockedIn? 'Clock Out ': 'Clock In ' }}  <ion-spinner *ngIf="disableButton" name="dots" slot="end"></ion-spinner>
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+    <ion-row>
+      <!-- <ion-col size="4" offset="4"> -->
+        <!-- <div  #clockInButton *ngIf="!this.user.isAdmin" class="center bounceIn" style="width:100%; height: 100%; margin:0 auto; margin-top:75%; "> -->
+          <!-- <a class="btn" (click)="isClockedIn? newClockOut(): newClockIn(); " > {{isClockedIn? 'CLOCK OUT': 'CLOCK IN'}} </a>
+            <ion-button  [color]="isClockedIn ? 'danger' : 'warning'" (click)="isClockedIn? newClockOut(): newClockIn()"  expand="block" shape="round" [disabled]="disableButton">
+              {{isClockedIn? 'Clock Out ': 'Clock In ' }}  <ion-spinner *ngIf="disableButton" name="dots" slot="end"></ion-spinner>
+            </ion-button>
+            -->
+         
+  
+        <!-- </div> -->
+
+      <!-- </ion-col> -->
+
+      <ion-col size="12">
+        <div *ngIf="this.user.isAdmin">
+          <ion-button color="warning" (click)="onPickLocation()" size="full" >
+            <ion-icon name="map" slot="start"></ion-icon>
+            <ion-label> Open Map</ion-label>
+        </ion-button>
+      </div>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+</div>
+
+<style>
+/* .btn{
+    display: inline-block;
+    text-decoration: none;
+    background: red;
+    color: #FFF;
+    width: 220px;
+    height: 220px;
+    line-height: 220px;
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: middle;
+    overflow: hidden;
+    box-shadow: 0px 0px 0px 5px #87befd;
+    border: dashed 1px #FFF;
+    transition: .4s;
+    
+}
+
+.btn:hover{
+    background: #668ad8;
+     box-shadow: 0px 0px 0px 5px #668ad8;
+}
+
+.center{
+  margin-top:55%;
+  margin-left: 23%;
+} */
+
+
+</style>

@@ -1,0 +1,8 @@
+{
+  "name": "projectX",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "87423a4a"
+}

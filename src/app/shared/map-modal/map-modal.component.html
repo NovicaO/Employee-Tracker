@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{this.fullDate}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onCancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="secondary">
+      <ion-button (click)="previousDay()"><ion-icon name="arrow-round-back"></ion-icon></ion-button>
+    </ion-buttons>
+    <ion-buttons  slot="primary">
+      <ion-button (click)="nextDay()"><ion-icon name="arrow-round-forward"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+  <div class="map" #map></div>
+
+</ion-content>
