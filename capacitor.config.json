@@ -1,5 +1,5 @@
 {
-  "appId": "westparkExpress",
+  "appId": "com.westparkexpress.www",
   "appName": "Westpark Express",
   "bundledWebRuntime": false,
   "npmClient": "npm",
