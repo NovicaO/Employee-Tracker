@@ -250,6 +250,11 @@ export class ClockInService {
     return this.http.get<returnData>(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=AIzaSyCgWD6kj33gXXJOVWQQT4alNxJ1LNj5txM`);
  }
 
+ getConfig() {
+   return this.http.get(`https://westparkexpress-910c4.firebaseio.com/config.json?auth=${this.authUser.user.tokenId}`);
+
+
+} 
 
   getData() {
     return this.http.get<Data[]>(`https://westparkexpress-910c4.firebaseio.com/clock-in.json?auth=${this.authUser.user.tokenId}`);

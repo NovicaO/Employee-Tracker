@@ -13,7 +13,7 @@
 <ion-content>
  
   <!-- Card for adding a new event -->
-  <ion-card *ngIf="user.isAdmin">
+  <ion-card *ngIf="user.isAdmin || configData.config_calendar_view">
     <ion-card-header tappable (click)="collapseCard = !collapseCard">
       <ion-card-title>New Event</ion-card-title>
     </ion-card-header>

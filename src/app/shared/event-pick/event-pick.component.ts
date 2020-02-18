@@ -10,6 +10,7 @@ import { User } from 'src/app/auth/user.model';
 import { Event } from './event.model';
 import { EditEventPage } from './edit-event/edit-event.page';
 import {take} from 'rxjs/operators';
+import { ClockInService } from 'src/app/employee/clock-in/clock-in.service';
 @Component({
   selector: 'app-event-pick',
   templateUrl: './event-pick.component.html',
@@ -32,7 +33,8 @@ export class EventPickComponent implements OnInit {
   eventSource = [];
   viewTitle;
   eventSourceSubject = new Subject<Event>();
- 
+  configData: any = {config_calendar_view: false, config_history_view: false};
+
   calendar = {
     mode: 'month',
     currentDate: new Date(),
@@ -42,7 +44,7 @@ export class EventPickComponent implements OnInit {
   user: User;
   constructor(private alertCtrl: AlertController, @Inject(LOCALE_ID) private locale: string, private http: HttpClient,
   private fireb: AngularFireDatabase, private authService: AuthService, private toastCtrl: ToastController, 
-  public modalController: ModalController) { }
+  public modalController: ModalController, private clockInService: ClockInService) { }
 
 
   loadEvents(){
@@ -99,6 +101,13 @@ export class EventPickComponent implements OnInit {
     this.resetEvent();
 
     this.user = this.authService.user;
+
+    this.clockInService.getConfig().pipe(take(1)).subscribe(data=>{
+      console.log(data);
+      this.configData = data;
+    });
+
+
   }
 
 
