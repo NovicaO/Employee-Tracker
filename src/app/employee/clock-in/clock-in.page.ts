@@ -26,7 +26,6 @@ export class ClockInPage implements OnInit, AfterViewInit {
 
   ngAfterViewInit(){
 
-    if(this.component){
       this.component.ionChange.subscribe(data =>{
         this.clockInData = [];
         let cd = new Date(data.detail.value);
@@ -44,7 +43,6 @@ export class ClockInPage implements OnInit, AfterViewInit {
         });
     
     });
-    }
 
     this.clockInService.getConfig().subscribe(data =>{
       this.configData = data;

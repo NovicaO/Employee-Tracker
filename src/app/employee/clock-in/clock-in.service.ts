@@ -2,13 +2,16 @@ import { Component, OnInit, Injectable } from '@angular/core';
 
 
 import {take} from 'rxjs/operators';
-import { Plugins, Capacitor, Geolocation } from '@capacitor/core';
+import { Plugins, Capacitor } from '@capacitor/core';
 import { Data } from './data.model';
 import { HttpClient } from '@angular/common/http';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Subject, Observable } from 'rxjs';
 import { User } from 'src/app/auth/user.model';
 import { AuthService } from 'src/app/auth/auth.service';
+
+
+const { Geolocation } = Plugins;
 
 interface returnData{
   results: {
@@ -66,16 +69,16 @@ export class ClockInService {
 
 
 
-
   currentId;
   async getCurrentPosition() {
+
     this.emitButton(true);
     const geoPosition = await Geolocation.getCurrentPosition();
     let data: Data = {startLat: geoPosition.coords.latitude, startLng: geoPosition.coords.longitude, startTime: new Date(geoPosition.timestamp).toLocaleString(), userId: this.authUser.user.uid, clockedIn: true, userName: this.authUser.user.firstName + ' ' + this.authUser.user.lastName, accuracyIn: geoPosition.coords.accuracy, speedIn: geoPosition.coords.speed  };
     this.emitSingleData(data);
     this.data = data;
 
-
+ 
     let datum = new Date(geoPosition.timestamp);
 
     this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();

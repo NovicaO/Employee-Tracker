@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <div *ngIf="configData.config_historty_view">
+  <div [hidden]="!configData.config_historty_view">
   <ion-item>
     <ion-label>Start Date</ion-label>
     <ion-datetime  placeholder="Select Date" #date ></ion-datetime>
