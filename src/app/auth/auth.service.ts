@@ -6,8 +6,10 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs/operators';
 import { Data } from '../employee/clock-in/data.model';
-import { Plugins, Storage } from '@capacitor/core';
+import { Plugins, Storage, Device } from '@capacitor/core';
 import { ToastController, AlertController } from '@ionic/angular';
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +45,7 @@ export class AuthService {
       this.user.isAdmin = data.isAdmin;
       this.user.isActivated = data.isActivated;
       this.user.canSeeCalendar = data.canSeeCalendar;
-      console.log(data.isActivated);
+      this.user.deviceId = data.deviceId;
       if(!data.isActivated){
         this.authF.auth.signOut();
         this.presentToast('Waiting for admin to approve your account!');
@@ -51,7 +53,7 @@ export class AuthService {
       }
 
       this.autoLogout(this.tokenDuration());
-      this.setObject(data.email, data.password, et, ti, u.user.uid);
+      // this.setObject(data.email, data.password, et, ti, u.user.uid);
       if (this.user.uid) {
         if (this.user.isAdmin) {
           this.router.navigate(['/admin/tabs/admin-clock-in']);
@@ -81,9 +83,10 @@ export class AuthService {
   }
 
   async register(user: User){
+      const info = await Device.getInfo();
       let uname =user.email.replace(/ /g, '');
       const result = await this.authF.auth.createUserWithEmailAndPassword(uname, user.password);
-      this.createProfile(user, result.user.uid);
+      this.createProfile(user, result.user.uid, info.uuid);
   }
 
   async logout() {
@@ -124,21 +127,32 @@ export class AuthService {
   }
 
   async setObject(email, password, expirationDate, token, uid) {
-    let data =  JSON.stringify({
-      email, password, expirationDate, token, uid
-    }); 
-    await Storage.set({
-      key: 'data',
-      value: data
-    });
+    // await Storage.set({
+    //   key: 'email',
+    //   value: email
+    // });
+    // await Storage.set({
+    //   key: 'password',
+    //   value: password
+    // });
+    // let data =  JSON.stringify({
+    //   email, password, expirationDate, token, uid
+    // }); 
+    // await Storage.set({
+    //   key: 'data',
+    //   value: data
+    // });
 
   }
 
 
-  createProfile(user: User, uid:string) {
+
+
+  createProfile(user: User, uid:string, deviceId: string) {
     user.isAdmin = false;
     user.isActivated = false;
     user.canSeeCalendar = false;
+    user.deviceId = deviceId;
     this.fireb.object(`profile/${uid}`).set(user);
   }
 

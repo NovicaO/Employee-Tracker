@@ -2,17 +2,16 @@ import { Component, OnInit, Injectable } from '@angular/core';
 
 
 import {take} from 'rxjs/operators';
-import { Plugins, Capacitor } from '@capacitor/core';
+import { Plugins, Capacitor, Device } from '@capacitor/core';
 import { Data } from './data.model';
 import { HttpClient } from '@angular/common/http';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { Subject, Observable } from 'rxjs';
 import { User } from 'src/app/auth/user.model';
 import { AuthService } from 'src/app/auth/auth.service';
-
+import { ToastController } from '@ionic/angular';
 
 const { Geolocation } = Plugins;
-
 interface returnData{
   results: {
     formatted_address
@@ -25,12 +24,12 @@ interface returnData{
 
 
 export class ClockInService {
-
+  private toastCtrl: ToastController;
   public singleData = new Subject<Data>();
   public clockInData = new Subject<Data[]>();
   public globalDate = new Subject<Date>();
   public clockInButton = new Subject<boolean>();
-
+  public displayErrorMessage = new Subject<string>();
   //switching from clock in info to clock out info on the administration clock in page and maps!
   public switchButton = new Subject<boolean>();
 
@@ -46,10 +45,13 @@ export class ClockInService {
   ) {
     }
   //switching between clock in and clock out data at administration clock in page
-    emitSwitch(cond){
-     
-      this.switchButton.next(cond);
-    }
+  emitSwitch(cond){
+    this.switchButton.next(cond);
+  }
+
+  emitError(err){
+    this.displayErrorMessage.next(err);
+  }
   
   emitButton(cond){
     this.clockInButton.next(cond);
@@ -71,29 +73,66 @@ export class ClockInService {
 
   currentId;
   async getCurrentPosition() {
-
+    const info = await Device.getInfo();
+    if(info.uuid != this.authUser.user.deviceId){
+      console.log(info.uuid);
+      console.log(this.authUser.user.deviceId);
+      this.displayErrorMessage.next('You are NOT using the device you registered your account with!');
+      return;
+    }
+    
     this.emitButton(true);
-    const geoPosition = await Geolocation.getCurrentPosition();
-    let data: Data = {startLat: geoPosition.coords.latitude, startLng: geoPosition.coords.longitude, startTime: new Date(geoPosition.timestamp).toLocaleString(), userId: this.authUser.user.uid, clockedIn: true, userName: this.authUser.user.firstName + ' ' + this.authUser.user.lastName, accuracyIn: geoPosition.coords.accuracy, speedIn: geoPosition.coords.speed  };
-    this.emitSingleData(data);
-    this.data = data;
+    try{ 
+      const geoPosition = await Geolocation.getCurrentPosition({
+        enableHighAccuracy : true,
+        maximumAge: 0,
+        requireAltitude: false
+      });
+      
+      let data: Data = {startLat: geoPosition.coords.latitude, startLng: geoPosition.coords.longitude, startTime: new Date(geoPosition.timestamp).toLocaleString(), userId: this.authUser.user.uid, clockedIn: true, userName: this.authUser.user.firstName + ' ' + this.authUser.user.lastName, accuracyIn: geoPosition.coords.accuracy, speedIn: geoPosition.coords.speed  };
+      this.emitSingleData(data);
+      this.data = data;
 
- 
-    let datum = new Date(geoPosition.timestamp);
+  
+      let datum = new Date(geoPosition.timestamp);
 
-    this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();
-    let hours = datum.getHours()+':'+datum.getMinutes()+':'+datum.getSeconds();
-    let id = this.fireb.createPushId();
-    this.currentId = id;
-    this.fireb.object(`clock-in/${this.fullDate}/${this.authUser.user.uid}/${id}`).set(data).then(value => {
-      this.emitButton(false);
-    });
+      this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();
+      let hours = datum.getHours()+':'+datum.getMinutes()+':'+datum.getSeconds();
+      let id = this.fireb.createPushId();
+      this.currentId = id;
+      this.fireb.object(`clock-in/${this.fullDate}/${this.authUser.user.uid}/${id}`).set(data).then(value => {
+    
+    
+        this.emitButton(false);
+      }).catch(reason =>{
+        console.log(reason);
+        
+      });
+    } catch(error){
+      if(error.message == 'User denied Geolocation'){
+        this.emitButton(false);
+        this.displayErrorMessage.next('You denied access to internet, go to settings and allow it again!');
+      }else{
+        this.emitButton(false);
+      }
+    }
 
+
+  
   }
 
 
 
   async getCurrentPositionOut(data) {
+    const info = await Device.getInfo();
+    
+    if(info.uuid != this.authUser.user.deviceId){
+      console.log(info.uuid);
+      console.log(this.authUser.user.deviceId);
+      this.displayErrorMessage.next('You are NOT using the device you registered your account with!');
+ 
+      return;
+    }
     let id;
     let datum;
 
@@ -105,8 +144,6 @@ export class ClockInService {
       datum = this.getFullDateFormat(new Date());
       id = this.currentId;
     }
-    console.log(datum);
-    console.log(id);
     this.getSpecificData(datum, id).pipe(take(1)).subscribe(async data => {
     this.data = data;
     if(!data){
@@ -114,10 +151,14 @@ export class ClockInService {
     }
 
     if(!Capacitor.isPluginAvailable('Geolocation')) {
-      console.log('Could not fetch location');
       return;
     }
-    const geoPosition = await Geolocation.getCurrentPosition();
+    
+    const geoPosition = await Geolocation.getCurrentPosition({
+      enableHighAccuracy : true,
+      maximumAge: 0,
+      requireAltitude: false
+    });
     this.data.endTime = new Date(geoPosition.timestamp).toLocaleString();
     this.data.endLat = geoPosition.coords.latitude;
     this.data.endLng = geoPosition.coords.longitude;
@@ -141,66 +182,66 @@ export class ClockInService {
   //   })
   // }
 
-  clockIn() {
-    if(!Capacitor.isPluginAvailable('Geolocation')) {
-      console.log('Could not fetch location');
-      return;
-    }
-    Plugins.Geolocation.getCurrentPosition().then(geoPosition =>{
-      this.getAddress(geoPosition.coords.latitude, geoPosition.coords.longitude).pipe(take(1)).subscribe(information => {
+  // clockIn() {
+  //   if(!Capacitor.isPluginAvailable('Geolocation')) {
+  //     console.log('Could not fetch location');
+  //     return;
+  //   }
+  //   Plugins.Geolocation.getCurrentPosition().then(geoPosition =>{
+  //     this.getAddress(geoPosition.coords.latitude, geoPosition.coords.longitude).pipe(take(1)).subscribe(information => {
 
-        let ca = information.results[0].formatted_address;
-        let data: Data = {startLat: geoPosition.coords.latitude, startLng: geoPosition.coords.longitude, startTime: new Date(geoPosition.timestamp).toLocaleString(), userId: this.authUser.user.uid, clockedIn: true, startAddress: ca, userName: this.authUser.user.firstName + ' ' + this.authUser.user.lastName  };
-        this.emitSingleData(data);
-        this.data = data;
-
-
-        let datum = new Date(geoPosition.timestamp);
-
-        this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();
-        let hours = datum.getHours()+':'+datum.getMinutes()+':'+datum.getSeconds();
-        this.fireb.object(`clock-in/${this.fullDate}/${this.authUser.user.uid}/${hours}`).set(data);
-      });
+  //       let ca = information.results[0].formatted_address;
+  //       let data: Data = {startLat: geoPosition.coords.latitude, startLng: geoPosition.coords.longitude, startTime: new Date(geoPosition.timestamp).toLocaleString(), userId: this.authUser.user.uid, clockedIn: true, startAddress: ca, userName: this.authUser.user.firstName + ' ' + this.authUser.user.lastName  };
+  //       this.emitSingleData(data);
+  //       this.data = data;
 
 
-    });
+  //       let datum = new Date(geoPosition.timestamp);
+
+  //       this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();
+  //       let hours = datum.getHours()+':'+datum.getMinutes()+':'+datum.getSeconds();
+  //       this.fireb.object(`clock-in/${this.fullDate}/${this.authUser.user.uid}/${hours}`).set(data);
+  //     });
+
+
+  //   });
  
-  }
+  // }
   
-  clockOut(){
-    let key;
-    this.getSingleData().pipe(take(1)).subscribe(data => {
-      key = Object.keys(data)[0];
-      this.data = Object.values(data)[0];
-      if(!this.data) {
-        return;
-      }
-      if(!Capacitor.isPluginAvailable('Geolocation')) {
-        console.log('Could not fetch location');
-        return;
-      }
-      Plugins.Geolocation.getCurrentPosition().then(geoPosition =>{
+  // clockOut(){
+  //   let key;
+  //   this.getSingleData().pipe(take(1)).subscribe(data => {
+  //     key = Object.keys(data)[0];
+  //     this.data = Object.values(data)[0];
+  //     if(!this.data) {
+  //       return;
+  //     }
+  //     if(!Capacitor.isPluginAvailable('Geolocation')) {
+  //       console.log('Could not fetch location');
+  //       return;
+  //     }
+  //     Plugins.Geolocation.getCurrentPosition().then(geoPosition =>{
   
-        this.getAddress(geoPosition.coords.latitude, geoPosition.coords.longitude).pipe(take(1)).subscribe(information => {
-          this.data.endTime = new Date().toLocaleString();
-          this.data.endLat = geoPosition.coords.latitude;
-          this.data.endLng = geoPosition.coords.longitude;
-          this.data.endAddress = information.results[0].formatted_address;
+  //       this.getAddress(geoPosition.coords.latitude, geoPosition.coords.longitude).pipe(take(1)).subscribe(information => {
+  //         this.data.endTime = new Date().toLocaleString();
+  //         this.data.endLat = geoPosition.coords.latitude;
+  //         this.data.endLng = geoPosition.coords.longitude;
+  //         this.data.endAddress = information.results[0].formatted_address;
   
-          let total = this.calculateWorkHours();
+  //         let total = this.calculateWorkHours();
       
-          this.data.totalHours = total.h + ':' + total.m + ':' + total.s;
-          this.emitSingleData(this.data);
-          let datum = new Date(geoPosition.timestamp);
-          this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();
-          this.fireb.object(`clock-in/${this.fullDate}/${this.authUser.user.uid}/${key}`).set(this.data);
+  //         this.data.totalHours = total.h + ':' + total.m + ':' + total.s;
+  //         this.emitSingleData(this.data);
+  //         let datum = new Date(geoPosition.timestamp);
+  //         this.fullDate = datum.getFullYear() + '-' + (datum.getMonth() + 1) + '-' + datum.getDate();
+  //         this.fireb.object(`clock-in/${this.fullDate}/${this.authUser.user.uid}/${key}`).set(this.data);
   
-        });
+  //       });
    
-      });
-    });
+  //     });
+  //   });
 
-  }
+  // }
 
 
   calculateWorkHours() {

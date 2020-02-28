@@ -1,13 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-  <string name="app_name">projectX</string>
-  <string name="title_activity_main">projectX</string>
-  <string name="package_name">io.ionic.starter</string>
-  <string name="custom_url_scheme">io.ionic.starter</string>
-  <string name="ionic_app_id">--app-id="7de21777" \</string>
-  <string name="ionic_channel_name">Master</string>
-  <string name="ionic_update_method">background</string>
-  <string name="ionic_max_versions">2</string>
-  <string name="ionic_min_background_duration">30</string>
-  <string name="ionic_update_api">https://api.ionicjs.com</string>
+    <string name="app_name">Westpark Express</string>
+    <string name="title_activity_main">Westpark Express</string>
+    <string name="package_name">com.westparkexpress.www</string>
+    <string name="custom_url_scheme">com.westparkexpress.www</string>
 </resources>

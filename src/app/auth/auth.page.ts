@@ -3,10 +3,8 @@ import { User } from './user.model';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
-import {take} from 'rxjs/operators';
-import { throwError, Observable } from 'rxjs';
 import { Plugins } from '@capacitor/core';
-import { parse } from 'querystring';
+
 
 const { Storage } = Plugins;
 @Component({
@@ -15,16 +13,28 @@ const { Storage } = Plugins;
   styleUrls: ['./auth.page.scss'],
 })
 export class AuthPage implements OnInit, AfterViewInit {
-  ngAfterViewInit() {
 
-  }
   isLogin = true;
   user = {} as User;
+  constructor(private authService: AuthService, private router: Router, private alertCtrl: AlertController, private toastCtrl: ToastController, public loadingCtrl: LoadingController) { 
+    let email = Storage.get({key:'email'}).then(val =>{
+      this.user.email = val.value;
+    });
+    let password = Storage.get({key:'password'}).then(val =>{
+      this.user.password = val.value;
+    });
 
-  constructor(private authService: AuthService, private router: Router, private alertCtrl: AlertController, private toastCtrl: ToastController, public loadingCtrl: LoadingController) { }
+  }
+
+
 
   ngOnInit() {
-    // this.autoLogin();
+  }
+
+   ngAfterViewInit() {
+
+
+
   }
 
   switchMode() {
@@ -49,7 +59,7 @@ export class AuthPage implements OnInit, AfterViewInit {
     //   }
 
       
-    //   this.setObject(data.email, data.password);
+      this.setObject(user.email, user.password);
     //   if (this.authService.user.uid) {
     //     if (this.authService.user.isAdmin) {
     //       this.router.navigate(['/admin/tabs/admin-clock-in']);
@@ -87,16 +97,16 @@ export class AuthPage implements OnInit, AfterViewInit {
     });
     toast.present();
   }
-  // async setObject(email, password) {
-  //   await Storage.set({
-  //     key: 'email',
-  //     value: email
-  //   });
-  //   await Storage.set({
-  //     key: 'password',
-  //     value: password
-  //   });
-  // }
+  async setObject(email, password) {
+    await Storage.set({
+      key: 'email',
+      value: email
+    });
+    await Storage.set({
+      key: 'password',
+      value: password
+    });
+  }
  
   
   // async autoLogin() {

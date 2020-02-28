@@ -5,11 +5,14 @@
       {{ viewTitle }}
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="today()">Today</ion-button>
+      <!-- <ion-button (click)="today()">Today</ion-button> -->
+      <ion-button (click)="loadEvents()">Refresh</ion-button>
+      <ion-button>Attending</ion-button>
     </ion-buttons>
+
   </ion-toolbar>
 </ion-header>
- 
+
 <ion-content>
  
   <!-- Card for adding a new event -->
@@ -69,19 +72,19 @@
   </ion-row>
  
   <calendar 
-  [eventSource]="eventSource" 
-  [calendarMode]="calendar.mode" 
-  [currentDate]="calendar.currentDate"
-  (onEventSelected)="onEventSelected($event)"
-  (onTitleChanged)="onViewTitleChanged($event)"
-  (onTimeSelected)="onTimeSelected($event)" 
-  startHour="6"
-  endHour="20"
-  step="30"
-  startingDayWeek="1">
+    [eventSource]="eventSource" 
+    [calendarMode]="calendar.mode" 
+    [currentDate]="calendar.currentDate"
+    (onEventSelected)="onEventSelected($event)"
+    (onTitleChanged)="onViewTitleChanged($event)"
+    (onTimeSelected)="onTimeSelected($event)" 
+    startHour="6"
+    endHour="20"
+    step="30"
+    startingDayWeek="1">
   </calendar>
-
 
 
  
 </ion-content>
+

@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ClockInService } from './clock-in.service';
 import { Data } from './data.model';
 import { take } from 'rxjs/operators';
+import { ToastController } from '@ionic/angular';
+
 @Component({
   selector: 'app-clock-in',
   templateUrl: './clock-in.page.html',
@@ -15,14 +17,22 @@ export class ClockInPage implements OnInit, AfterViewInit {
   configData: any = {config_calendar_view: false, config_history_view: false};
 
   
-  constructor(private clockInService: ClockInService) { }
+  constructor(private clockInService: ClockInService, private toastCtrl: ToastController) { }
 
   ngOnInit() {
-
+    this.clockInService.displayErrorMessage.subscribe(err =>{
+      this.presentToast(err);
+  });
   }
 
 
-
+  async presentToast(information: string) {
+    const toast = await this.toastCtrl.create({
+      message: information,
+      duration: 2000
+    });
+    toast.present();
+  }
 
   ngAfterViewInit(){
 
@@ -43,7 +53,6 @@ export class ClockInPage implements OnInit, AfterViewInit {
         });
     
     });
-
     this.clockInService.getConfig().subscribe(data =>{
       this.configData = data;
     });

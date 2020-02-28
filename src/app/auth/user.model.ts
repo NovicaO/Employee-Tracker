@@ -10,4 +10,5 @@ export interface User {
     canSeeCalendar?: boolean;
     tokenId?: string;
     expiresIn?: Date;
+    deviceId?: string;
 }

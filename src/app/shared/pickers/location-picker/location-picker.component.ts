@@ -7,6 +7,7 @@ import { User } from 'src/app/auth/user.model';
 import { ClockInService } from 'src/app/employee/clock-in/clock-in.service';
 import { Data } from 'src/app/employee/clock-in/data.model';
 import {take} from 'rxjs/operators';
+import { Device } from '@capacitor/core';
 
 @Component({
   selector: 'app-location-picker',
@@ -32,6 +33,7 @@ export class LocationPickerComponent implements OnInit {
   showStartLatLng;
   currentData;
   ngOnInit() {
+
     this.disableButton = true;
     this.clockInService.switchButton.subscribe( cond =>{
       this.showStartLatLng = cond;
@@ -98,23 +100,22 @@ export class LocationPickerComponent implements OnInit {
     });
   }
 
-  clockIn() {
-    this.clockInService.clockIn();
-  }
+  // clockIn() {
+  //   this.clockInService.clockIn();
+  // }
 
-  clockOut() {
-    this.clockInService.clockOut();
-  }
+  // clockOut() {
+  //   this.clockInService.clockOut();
+  // }
   
 
-  newClockIn(){
+  async newClockIn(){
    this.clockInService.getCurrentPosition();
 
   }
-  newClockOut(){
+  async newClockOut(){
     this.clockInService.getCurrentPositionOut(this.currentData);
   }
-  
 
 
 

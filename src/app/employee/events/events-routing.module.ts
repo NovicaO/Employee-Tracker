@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: EventsPage
+  },  {
+    path: 'booked-events',
+    loadChildren: () => import('./booked-events/booked-events.module').then( m => m.BookedEventsPageModule)
   }
+
 ];
 
 @NgModule({

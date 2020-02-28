@@ -1,7 +1,7 @@
 import { CalendarComponent } from 'ionic2-calendar/calendar';
 import { Component, ViewChild, OnInit, Inject, LOCALE_ID, AfterViewInit } from '@angular/core';
 import { AlertController, ToastController, ModalController } from '@ionic/angular';
-import { formatDate } from '@angular/common';
+import { formatDate, DOCUMENT } from '@angular/common';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AngularFireDatabase } from '@angular/fire/database';
@@ -43,7 +43,7 @@ export class EventPickComponent implements OnInit {
   @ViewChild(CalendarComponent, {static: true } ) myCal: CalendarComponent;
   user: User;
   constructor(private alertCtrl: AlertController, @Inject(LOCALE_ID) private locale: string, private http: HttpClient,
-  private fireb: AngularFireDatabase, private authService: AuthService, private toastCtrl: ToastController, 
+  private fireb: AngularFireDatabase, private authService: AuthService, private toastCtrl: ToastController,
   public modalController: ModalController, private clockInService: ClockInService) { }
 
 
@@ -71,12 +71,17 @@ export class EventPickComponent implements OnInit {
       this.myCal.loadEvents();
     });
     this.resetEvent();
+
+  
+  
   }
 
- 
+
+  bookedEvents: Event[] =[];
 
 
   ngOnInit() {
+    
     this.getData().subscribe(data =>{
       for (let k in data) {
         if (data.hasOwnProperty(k)) {
@@ -93,9 +98,22 @@ export class EventPickComponent implements OnInit {
   
           }
         }
+  
         this.eventSource.push(data[k]);
         }
       }
+
+      this.bookedEvents = [];
+      this.eventSource.forEach( data =>{
+        if(data.employees){
+        data.employees.forEach(empl => {
+          if(empl.uid === this.authService.user.uid){
+            this.bookedEvents.push(data);
+          }
+        });
+      }
+      });
+      console.log(this.bookedEvents);
       this.myCal.loadEvents();
     });
     this.resetEvent();
@@ -103,13 +121,12 @@ export class EventPickComponent implements OnInit {
     this.user = this.authService.user;
 
     this.clockInService.getConfig().pipe(take(1)).subscribe(data=>{
-      console.log(data);
+      // console.log(data);
       this.configData = data;
     });
 
 
   }
-
 
 
   async presentModal(event: Event) {
@@ -312,6 +329,10 @@ async onEventSelected(event: Event) {
           }
             this.presentToast('You singed up for ' + event.title + ' event!');
             change.employees.push(this.user);
+            console.log(change.employees);
+            if(!this.user.deviceId){
+              this.user.deviceId = '';
+            }
             this.fireb.object(`events/${event.id}/employees`).set(change.employees);
           }else{
             this.presentToast('You opt out from ' + event.title + ' event!');
